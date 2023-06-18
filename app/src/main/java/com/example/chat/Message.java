@@ -56,5 +56,12 @@ public class Message {
     public String getCreated(){
         return this.created;
     }
+
+    public void setIsSender(String logged) {
+        if(sender.getUsername().equals(logged))
+            this.isSender=true;
+        else
+            this.isSender = false;
+    }
 }
 

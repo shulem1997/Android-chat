@@ -28,7 +28,6 @@ public class ContactsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        System.out.println("contacts");
         binding = ActivityContactsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
@@ -62,8 +61,9 @@ public class ContactsActivity extends AppCompatActivity {
         lvChats.setAdapter(adapter);
         lvChats.setOnItemClickListener((adapterView, view, i, l) -> {
             Intent intent = new Intent(this, ChatActivity.class);
-            intent.putExtra("id", chatList.get(i).getId());
-            startActivity(intent);
+            String[] arr = new String[] {logged.getUsername(), chatList.get(i).getIdStr() };
+            intent.putExtra("chatInfo", arr);
+                startActivity(intent);
         });
 
     }
@@ -72,7 +72,11 @@ public class ContactsActivity extends AppCompatActivity {
         contacts.clear();
         chatList = userDao.get(logged.getUsername()).getChats();
         for (Chat chat : chatList) {
-            contacts.add(chat.getUser().getUsername());
+            contacts.add(chat.getUser().getDisplayName());
+            //Triple t = new Triple();
+            //t.setImg(chat.getUser().getProfilePic());
+            //t.setName(chat.getUser().getDisplayName());
+
         }
 
         adapter.notifyDataSetChanged();
