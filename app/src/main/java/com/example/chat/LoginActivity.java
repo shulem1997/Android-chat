@@ -116,6 +116,7 @@ public class LoginActivity extends AppCompatActivity {
             Intent intent = new Intent(this, ContactsActivity.class);
             String[] arr = new String[] {username, password};
             intent.putExtra("username", username);
+            intent.putExtra("password", password);
             startActivity(intent);
         }
         else{
