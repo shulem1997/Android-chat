@@ -97,7 +97,7 @@ public class ContactsActivity extends AppCompatActivity {
             @Override
             public void run() {
                 try {
-                    URL url = new URL("http://10.0.2.2:5000/api/Chats/");
+                    URL url = new URL(Settings.getServer()+"/api/Chats/");
                     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                     connection.setRequestMethod("GET");
                     connection.setRequestProperty("Content-Type", "application/json");
@@ -138,6 +138,66 @@ public class ContactsActivity extends AppCompatActivity {
             throw new RuntimeException(e);
         }
     }
+    private void postChatToServer(String username, String password, String chat){
+        getToken(username, password);
+        Thread thread = new Thread(new Runnable() {
+            private StringBuilder responseBody; // Variable to hold the response body
+
+            public StringBuilder getResponseBody() {
+                return responseBody;
+            }
+
+            @Override
+            public void run() {
+                try {
+                    URL url = new URL(Settings.getServer()+"/api/Chats/"); // Replace with your API endpoint
+
+                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                    connection.setRequestMethod("POST");
+                    connection.setRequestProperty("Content-Type", "application/json");
+                    connection.setDoOutput(true);
+
+                    String requestBody = chat;
+
+                    try {
+                        DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream());
+                        outputStream.writeBytes(requestBody);
+                        outputStream.flush();
+                        outputStream.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+
+                    StringBuilder responseBody;
+                    try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+                        String line;
+
+                        StringBuilder response = new StringBuilder();
+                        while ((line = reader.readLine()) != null) {
+                            response.append(line);
+                        }
+                        responseBody = new StringBuilder(response.toString()); // Assign the response to the variable
+                    }
+                    token=responseBody.toString();
+
+                    connection.disconnect();
+                } catch (IOException e) {
+                    e.printStackTrace();
+
+                }
+            }
+        });
+// Start the thread
+        thread.start();
+
+        try {
+            // Wait for the thread to finish
+            thread.join();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     private void getToken(String username, String password ) {
         Thread thread = new Thread(new Runnable() {
@@ -150,7 +210,7 @@ public class ContactsActivity extends AppCompatActivity {
             @Override
             public void run() {
                 try {
-                    URL url = new URL("http://10.0.2.2:5000/api/Tokens/"); // Replace with your API endpoint
+                    URL url = new URL(Settings.getServer()+"/api/Tokens/"); // Replace with your API endpoint
 
                     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                     connection.setRequestMethod("POST");
