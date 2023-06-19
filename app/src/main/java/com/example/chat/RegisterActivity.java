@@ -3,6 +3,8 @@ package com.example.chat;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -18,11 +20,17 @@ import androidx.room.Dao;
 import androidx.room.Room;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.util.Base64;
+import java.io.ByteArrayOutputStream;
 
 public class RegisterActivity extends Activity {
 
@@ -113,6 +121,13 @@ public class RegisterActivity extends Activity {
         String password = passwordEditText.getText().toString();
         String verifyPassword = verifyEditText.getText().toString();
         String displayName = displayNameEditText.getText().toString();
+        Drawable drawable = profilePicImageView.getDrawable();
+        Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();
+
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
+        byte[] byteArray = byteArrayOutputStream.toByteArray();
+        String profilePic=Base64.encodeToString(byteArray, Base64.DEFAULT);
 
         // Validate input fields
         if (username.isEmpty() || password.isEmpty() || verifyPassword.isEmpty() || displayName.isEmpty()) {
@@ -126,6 +141,11 @@ public class RegisterActivity extends Activity {
         }
 
         Thread thread = new Thread(new Runnable() {
+            Drawable drawable = profilePicImageView.getDrawable();
+            Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();
+
+
+
             private StringBuilder responseBody; // Variable to hold the response body
 
             public StringBuilder getResponseBody() {
@@ -135,14 +155,15 @@ public class RegisterActivity extends Activity {
             @Override
             public void run() {
                 try {
-                    URL url = new URL(Settings.getServer()+"/api/Tokens/"); // Replace with your API endpoint
+                    URL url = new URL(Settings.getServer()+"/api/Users/"); // Replace with your API endpoint
 
                     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                     connection.setRequestMethod("POST");
                     connection.setRequestProperty("Content-Type", "application/json");
                     connection.setDoOutput(true);
 
-                    String requestBody = "{\"username\": \"" + username + "\", \"password\": \"" + password + "\"}";
+                    String requestBody = "{\"username\": \"" + username + "\", \"password\": \"" + password + "\", \"displayName\": \"" + displayName + "\", \"profilePic\": \"" + profilePic + "\"}";
+
 
                     try {
                         DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream());
