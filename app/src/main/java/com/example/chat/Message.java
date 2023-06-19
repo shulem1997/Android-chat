@@ -63,5 +63,13 @@ public class Message {
         else
             this.isSender = false;
     }
+    public boolean getIsSender() {
+        return this.isSender;
+    }
+    public int getDraw() {
+        if(isSender)
+            return R.drawable.bubble_from;
+        return R.drawable.bubble_to;
+    }
 }
 

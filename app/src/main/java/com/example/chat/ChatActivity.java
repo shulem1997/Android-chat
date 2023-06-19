@@ -1,6 +1,7 @@
 package com.example.chat;
 
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -25,7 +26,7 @@ public class ChatActivity extends AppCompatActivity {
     private List<String> texts;
     private Chat chat;
     private List<Message> msgList;
-    private ArrayAdapter<String> adapter;
+    private MessageAdapter adapter;
     private int chatId;
 
     private ActivityChatBinding binding;
@@ -70,24 +71,26 @@ public class ChatActivity extends AppCompatActivity {
 
     private void handleMessages() {
         msgs = binding.messages;
-        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, texts);
-        texts = new ArrayList<>();
 
-        loadMessages();
+        msgList = setMsgsArray();
 
+        adapter = new MessageAdapter(this, msgList);
         msgs.setAdapter(adapter);
     }
 
     private void sendMsg(String msg) {
+        //server request here
+
+        binding.etInput.setText("");
     }
 
     private void loadMessages() {
 
+        // Assuming you have a list of messages called "messageList"
+
         msgList = setMsgsArray();
-        texts.clear();
-        for(Message m: msgList) {
-            texts.add(m.getContent() + " " + m.getCreated());
-        }
+        //texts.clear();
+
         adapter.notifyDataSetChanged();
     }
     private ArrayList<Message> setMsgsArray() {
@@ -110,4 +113,5 @@ public class ChatActivity extends AppCompatActivity {
         }
         return null;
     }
+
 }
