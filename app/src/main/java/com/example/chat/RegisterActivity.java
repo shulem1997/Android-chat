@@ -17,7 +17,12 @@ import android.widget.Toast;
 import androidx.room.Dao;
 import androidx.room.Room;
 
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 public class RegisterActivity extends Activity {
 
@@ -120,15 +125,65 @@ public class RegisterActivity extends Activity {
             return;
         }
 
-//        if (selectedImageUri == null) {
-//            Toast.makeText(getApplicationContext(), "Please select a profile picture", Toast.LENGTH_SHORT).show();
-//            return;
-//        }
+        Thread thread = new Thread(new Runnable() {
+            private StringBuilder responseBody; // Variable to hold the response body
 
-        // Perform the registration logic here
-        // ...
+            public StringBuilder getResponseBody() {
+                return responseBody;
+            }
 
-        // Display success message
+            @Override
+            public void run() {
+                try {
+                    URL url = new URL(Settings.getServer()+"/api/Tokens/"); // Replace with your API endpoint
+
+                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                    connection.setRequestMethod("POST");
+                    connection.setRequestProperty("Content-Type", "application/json");
+                    connection.setDoOutput(true);
+
+                    String requestBody = "{\"username\": \"" + username + "\", \"password\": \"" + password + "\"}";
+
+                    try {
+                        DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream());
+                        outputStream.writeBytes(requestBody);
+                        outputStream.flush();
+                        outputStream.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+
+
+                    StringBuilder responseBody;
+                    try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+                        String line;
+
+                        StringBuilder response = new StringBuilder();
+                        while ((line = reader.readLine()) != null) {
+                            response.append(line);
+                        }
+                        responseBody = new StringBuilder(response.toString()); // Assign the response to the variable
+                    }
+
+
+                    connection.disconnect();
+                } catch (IOException e) {
+                    e.printStackTrace();
+
+                }
+            }
+        });
+
+// Start the thread
+        thread.start();
+
+        try {
+            // Wait for the thread to finish
+            thread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         Toast.makeText(getApplicationContext(), "Registration successful", Toast.LENGTH_SHORT).show();
 
         //save to local db, change later*****************************:

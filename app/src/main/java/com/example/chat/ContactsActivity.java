@@ -97,7 +97,7 @@ public class ContactsActivity extends AppCompatActivity {
             @Override
             public void run() {
                 try {
-                    URL url = new URL("http://10.0.2.2:5000/api/Chats/");
+                    URL url = new URL(Settings.getServer()+"/api/Chats/");
                     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                     connection.setRequestMethod("GET");
                     connection.setRequestProperty("Content-Type", "application/json");
@@ -150,7 +150,7 @@ public class ContactsActivity extends AppCompatActivity {
             @Override
             public void run() {
                 try {
-                    URL url = new URL("http://10.0.2.2:5000/api/Chats/"); // Replace with your API endpoint
+                    URL url = new URL(Settings.getServer()+"/api/Chats/"); // Replace with your API endpoint
 
                     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                     connection.setRequestMethod("POST");
@@ -210,7 +210,7 @@ public class ContactsActivity extends AppCompatActivity {
             @Override
             public void run() {
                 try {
-                    URL url = new URL("http://10.0.2.2:5000/api/Tokens/"); // Replace with your API endpoint
+                    URL url = new URL(Settings.getServer()+"/api/Tokens/"); // Replace with your API endpoint
 
                     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                     connection.setRequestMethod("POST");
