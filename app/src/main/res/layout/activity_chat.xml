@@ -8,6 +8,14 @@
 
     tools:context=".ContactsActivity">
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/btnBack"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_margin="0pt"
+        android:src="@drawable/back_button"/>
     <TextView
         android:id="@+id/chatWith"
         android:layout_width="0dp"

@@ -1,5 +1,6 @@
 package com.example.chat;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
@@ -58,6 +59,12 @@ public class ChatActivity extends AppCompatActivity {
         chatWith.setText(chat.getUser().getDisplayName());
 
         handleMessages();
+
+        binding.btnBack.setOnClickListener(View-> {
+            Intent intent = new Intent(this, ContactsActivity.class);
+            intent.putExtra("username", username);
+            startActivity(intent);
+        });
 
     }
 

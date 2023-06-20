@@ -42,6 +42,10 @@ public class ContactsActivity extends AppCompatActivity {
             intent.putExtra("username", logged.getUsername());
             startActivity(intent);
         });
+        binding.btnBack.setOnClickListener(view-> {
+            Intent intent = new Intent(this, LoginActivity.class);
+            startActivity(intent);
+        });
     }
 
     @Override

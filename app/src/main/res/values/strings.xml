@@ -3,7 +3,7 @@
     <string name="app_name">chat</string>
     <string name="title_activity_chat">ChatActivity</string>
     <!-- Strings used for fragments for navigation -->
-   <string name="openChats">Open chats</string>
+   <string name="openChats"><b/><b/><b/>Open chats</string>
 
 
 </resources>
