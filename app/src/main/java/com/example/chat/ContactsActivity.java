@@ -11,6 +11,12 @@ import androidx.room.Room;
 import com.example.chat.databinding.ActivityContactsBinding;
 
 
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,6 +30,8 @@ public class ContactsActivity extends AppCompatActivity {
     private ArrayAdapter<String> adapter;
     private UserDao userDao;
     private User logged;
+    private String token;
+    private String chats;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,7 +50,7 @@ public class ContactsActivity extends AppCompatActivity {
             intent.putExtra("username", logged.getUsername());
             startActivity(intent);
         });
-        binding.btnBack.setOnClickListener(view-> {
+        binding.btnBack.setOnClickListener(view -> {
             Intent intent = new Intent(this, LoginActivity.class);
             startActivity(intent);
         });
@@ -65,9 +73,9 @@ public class ContactsActivity extends AppCompatActivity {
         lvChats.setAdapter(adapter);
         lvChats.setOnItemClickListener((adapterView, view, i, l) -> {
             Intent intent = new Intent(this, ChatActivity.class);
-            String[] arr = new String[] {logged.getUsername(), chatList.get(i).getIdStr() };
+            String[] arr = new String[]{logged.getUsername(), chatList.get(i).getIdStr()};
             intent.putExtra("chatInfo", arr);
-                startActivity(intent);
+            startActivity(intent);
         });
 
     }
@@ -85,8 +93,8 @@ public class ContactsActivity extends AppCompatActivity {
 
         adapter.notifyDataSetChanged();
     }
-  
-    private void getChatsFormServer(String username, String password){
+
+    private void getChatsFormServer(String username, String password) {
         getToken(username, password);
         Thread thread = new Thread(new Runnable() {
             private StringBuilder responseBody; // Variable to hold the response body
@@ -98,7 +106,7 @@ public class ContactsActivity extends AppCompatActivity {
             @Override
             public void run() {
                 try {
-                    URL url = new URL(Settings.getServer()+"/api/Chats/");
+                    URL url = new URL(Settings.getServer() + "/api/Chats/");
                     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                     connection.setRequestMethod("GET");
                     connection.setRequestProperty("Content-Type", "application/json");
@@ -121,8 +129,7 @@ public class ContactsActivity extends AppCompatActivity {
                     }
 
                     connection.disconnect();
-                }
-                catch (IOException e) {
+                } catch (IOException e) {
                     e.printStackTrace();
                     System.out.println(e.toString());
                 }
@@ -139,7 +146,8 @@ public class ContactsActivity extends AppCompatActivity {
             throw new RuntimeException(e);
         }
     }
-    private void postChatToServer(String username, String password, String chat){
+
+    private void postChatToServer(String username, String password, String chat) {
         getToken(username, password);
         Thread thread = new Thread(new Runnable() {
             private StringBuilder responseBody; // Variable to hold the response body
@@ -151,7 +159,7 @@ public class ContactsActivity extends AppCompatActivity {
             @Override
             public void run() {
                 try {
-                    URL url = new URL(Settings.getServer()+"/api/Chats/"); // Replace with your API endpoint
+                    URL url = new URL(Settings.getServer() + "/api/Chats/"); // Replace with your API endpoint
 
                     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                     connection.setRequestMethod("POST");
@@ -180,7 +188,7 @@ public class ContactsActivity extends AppCompatActivity {
                         }
                         responseBody = new StringBuilder(response.toString()); // Assign the response to the variable
                     }
-                    token=responseBody.toString();
+                    token = responseBody.toString();
 
                     connection.disconnect();
                 } catch (IOException e) {
@@ -200,7 +208,7 @@ public class ContactsActivity extends AppCompatActivity {
         }
     }
 
-    private void getToken(String username, String password ) {
+    private void getToken(String username, String password) {
         Thread thread = new Thread(new Runnable() {
             private StringBuilder responseBody; // Variable to hold the response body
 
@@ -211,14 +219,35 @@ public class ContactsActivity extends AppCompatActivity {
             @Override
             public void run() {
                 try {
-                    URL url = new URL(Settings.getServer()+"/api/Tokens/"); // Replace with your API endpoint
-
+                    URL url = new URL(Settings.getServer() + "/api/Chats/");
                     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                    connection.setRequestMethod("POST");
+                    connection.setRequestMethod("GET");
                     connection.setRequestProperty("Content-Type", "application/json");
-                    connection.setDoOutput(true);
+                    connection.setRequestProperty("Authorization", "Bearer " + token);
 
+                    int responseCode = connection.getResponseCode();
+                    if (responseCode == HttpURLConnection.HTTP_OK) {
+                        StringBuilder responseBody;
+                        try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+                            String line;
+                            StringBuilder response = new StringBuilder();
+                            while ((line = reader.readLine()) != null) {
+                                response.append(line);
+                            }
+                            chats = response.toString(); // Assign the response to the variable
+                        }
+                    } else {
+                        // Handle the error case
+                        System.out.println("HTTP GET request failed with response code: " + responseCode);
+                    }
 
-        adapter.notifyDataSetChanged();
+                    connection.disconnect();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    System.out.println(e.toString());
+                }
+            }
+        });
     }
 }
+
