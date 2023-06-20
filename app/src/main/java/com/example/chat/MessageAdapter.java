@@ -11,35 +11,85 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.chat.databinding.ReceivedMessageBinding;
+
+import com.example.chat.databinding.SentMessageBinding;
 
 import java.util.List;
 
-public class MessageAdapter extends ArrayAdapter<Message> {
+public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
+    private List<Message> msgList;
 
-    public MessageAdapter(Context context, List<Message> messages) {
-        super(context, 0, messages);
+    public static final int VIEW_TYPE_SENT = 1;
+    public static final int VIEW_TYPE_RECEIVE = 2;
+
+    public MessageAdapter(List<Message> msgList) {
+        this.msgList = msgList;
     }
 
     @NonNull
     @Override
-    public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-        if (convertView == null) {
-            convertView = LayoutInflater.from(getContext()).inflate(R.layout.item_message, parent, false);
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        if(viewType == VIEW_TYPE_SENT){
+            return new SentMessageView(
+                    SentMessageBinding.inflate(
+                            LayoutInflater.from(parent.getContext()),
+                            parent, false));
         }
-
-        // Get the current message
-        Message message = getItem(position);
-
-        // Get the views from the layout
-        ImageView bubbleImageView = convertView.findViewById(R.id.bubble);
-        TextView contentTextView = convertView.findViewById(R.id.messageContent);
-
-        // Set the bubble background drawable and message content
-        bubbleImageView.setBackground(ContextCompat.getDrawable(getContext(),message.getDraw()));
-        contentTextView.setText(message.getContent());
-
-        return convertView;
+        return new ReceivedMessageView(
+                ReceivedMessageBinding.inflate(
+                        LayoutInflater.from(parent.getContext()),
+                        parent, false
+                )
+        );
     }
+
+    @Override
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+        if(getItemViewType(position) == VIEW_TYPE_SENT) {
+            ((SentMessageView)holder).setData(msgList.get(position));
+        } else {
+            ((ReceivedMessageView)holder).setData(msgList.get(position));
+        }
+    }
+
+    @Override
+    public int getItemCount() {
+        return msgList.size();
+    }
+    public int getItemViewType(int position) {
+        if(msgList.get(position).getIsSender()) {
+            return VIEW_TYPE_SENT;
+        }
+        return VIEW_TYPE_RECEIVE;
+    }
+
+    static class SentMessageView extends RecyclerView.ViewHolder {
+        private final SentMessageBinding binding;
+        SentMessageView(SentMessageBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
+        }
+        void setData(Message m) {
+            binding.textMessage.setText(m.getContent());
+            binding.date.setText(m.getCreated());
+        }
+    }
+
+    static class ReceivedMessageView extends RecyclerView.ViewHolder {
+        private final ReceivedMessageBinding binding;
+        ReceivedMessageView(ReceivedMessageBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
+        }
+        void setData(Message m) {
+            binding.textMessage.setText(m.getContent());
+            binding.date.setText(m.getCreated());
+        }
+    }
+
 }
 
 

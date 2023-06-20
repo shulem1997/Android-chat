@@ -1,14 +1,12 @@
 package com.example.chat;
 
 import android.os.Bundle;
-import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.room.Room;
 
 import com.example.chat.databinding.ActivityChatBinding;
@@ -22,7 +20,7 @@ public class ChatActivity extends AppCompatActivity {
     private User logged;
     private AppDB db;
     private UserDao userDao;
-    private ListView msgs;
+    private RecyclerView msgs;
     private List<String> texts;
     private Chat chat;
     private List<Message> msgList;
@@ -74,7 +72,7 @@ public class ChatActivity extends AppCompatActivity {
 
         msgList = setMsgsArray();
 
-        adapter = new MessageAdapter(this, msgList);
+        adapter = new MessageAdapter(msgList);
         msgs.setAdapter(adapter);
     }
 
