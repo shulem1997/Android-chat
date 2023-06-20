@@ -12,6 +12,8 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.room.Room;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -38,10 +40,10 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-
+        Settings.setServer("http://10.0.2.2:5000");
         usernameEditText = findViewById(R.id.username);
         passwordEditText = findViewById(R.id.password);
-
+        FloatingActionButton settings = findViewById(R.id.settingsButton);
         Button loginButton = findViewById(R.id.loginButton);
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -49,7 +51,11 @@ public class LoginActivity extends AppCompatActivity {
                 clickLogin();
             }
         });
+        settings.setOnClickListener(view-> {
+            Intent intent = new Intent(this, SettingsActivity.class);
+            startActivity(intent);
 
+        });
         TextView link = findViewById(R.id.linkToRegister);
         link.setOnClickListener(view-> {
                 Intent intent = new Intent(this, RegisterActivity.class);
@@ -73,7 +79,7 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void run() {
                 try {
-                    URL url = new URL("http://10.0.2.2:5000/api/Tokens/"); // Replace with your API endpoint
+                    URL url = new URL(Settings.getServer()+"/api/Tokens/"); // Replace with your API endpoint
 
                     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                     connection.setRequestMethod("POST");
