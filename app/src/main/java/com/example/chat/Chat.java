@@ -35,6 +35,10 @@ public class Chat {
     public void setLastMessage(Message lastMessage) {
         this.lastMessage = lastMessage;
     }
+
+    public String getIdStr() {
+        return String.valueOf(id);
+    }
 }
 
 

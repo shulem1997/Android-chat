@@ -1,4 +1,6 @@
 package com.example.chat;
+import android.media.Image;
+
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
@@ -12,6 +14,7 @@ public class User {
     private String username;
     private String password;
     private String displayName;
+    private String profilePic;
     private ArrayList<Chat> chats;
     private ArrayList<Message> messages;
 
@@ -59,10 +62,15 @@ public class User {
         return this.messages;
     }
     public void setMessages(ArrayList<Message> msg) {
-        this.messages = msg;
+        this.messages = new ArrayList<>(msg);
     }
     public void setChats(ArrayList<Chat> cht) {
-        this.chats = cht;
+        this.chats = new ArrayList<>(cht);
+    }
+
+    public String getProfilePic() {return this.profilePic;}
+    public void setProfilePic(String pic) {
+        this.profilePic = pic;
     }
 
 }

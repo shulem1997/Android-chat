@@ -5,8 +5,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+
     tools:context=".ContactsActivity">
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/btnBack"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_margin="0pt"
+        android:src="@drawable/baseline_arrow_back_ios_new_24"/>
     <TextView
         android:id="@+id/chatWith"
         android:layout_width="0dp"
@@ -20,10 +29,17 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <ListView
-        android:id="@+id/msgs"
-        android:layout_width="0dp"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/messages"
+        android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:background="@drawable/background"
+        android:clipToPadding="false"
+        android:orientation="vertical"
+        android:overScrollMode="never"
+        android:padding="20dp"
+
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintTop_toBottomOf="@id/chatWith"
         app:layout_constraintBottom_toTopOf="@id/etInput"
         app:layout_constraintStart_toStartOf="parent"
@@ -38,19 +54,16 @@
         app:layout_constraintBottom_toBottomOf="parent"
 
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/msgs" />
+        app:layout_constraintTop_toBottomOf="@id/messages" />
 
     <Button
         android:id="@+id/btnSend"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="10pt"
-        android:layout_marginTop="16dp"
         android:text="Send"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-
-        app:layout_constraintTop_toBottomOf="@id/msgs" />
+        app:layout_constraintTop_toBottomOf="@id/messages" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
