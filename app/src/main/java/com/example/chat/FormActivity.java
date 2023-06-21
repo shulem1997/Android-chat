@@ -56,7 +56,7 @@ public class FormActivity extends AppCompatActivity {
         getToken(username, password);
         Thread thread = new Thread(new Runnable() {
             private StringBuilder responseBody; // Variable to hold the response body
-
+            AtomicInteger responseCode = new AtomicInteger();
             public StringBuilder getResponseBody() {
                 return responseBody;
             }
@@ -64,11 +64,12 @@ public class FormActivity extends AppCompatActivity {
             @Override
             public void run() {
                 try {
-                    URL url = new URL(Settings.getServer() + "/api/Chats/"); // Replace with your API endpoint
+                    URL url = new URL(Settings.getServer()+"/api/Chats/"); // Replace with your API endpoint
 
                     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                     connection.setRequestMethod("POST");
                     connection.setRequestProperty("Content-Type", "application/json");
+                    connection.setRequestProperty("Authorization", "Bearer " + token);
                     connection.setDoOutput(true);
 
                     String requestBody = "{\"username\": \"" + contact + "\"}";
@@ -83,6 +84,8 @@ public class FormActivity extends AppCompatActivity {
                     }
 
 
+                    responseCode.set(connection.getResponseCode());
+
                     StringBuilder responseBody;
                     try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
                         String line;
@@ -93,7 +96,7 @@ public class FormActivity extends AppCompatActivity {
                         }
                         responseBody = new StringBuilder(response.toString()); // Assign the response to the variable
                     }
-                    //token = responseBody.toString();
+                    token=responseBody.toString();
 
                     connection.disconnect();
                 } catch (IOException e) {

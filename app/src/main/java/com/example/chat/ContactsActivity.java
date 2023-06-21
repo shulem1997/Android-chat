@@ -65,6 +65,7 @@ public class ContactsActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         loadChatsFromServer(logged);
+
     }
 
 
@@ -100,6 +101,7 @@ public class ContactsActivity extends AppCompatActivity {
         for (Chat chat : chatList) {
             contacts.add(chat.getUser().getDisplayName());
         }
+        adapter.notifyDataSetChanged();
     }
 
     private void getChatsFormServer(String username, String password) {
