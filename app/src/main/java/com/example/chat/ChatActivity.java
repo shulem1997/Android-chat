@@ -53,11 +53,6 @@ public class ChatActivity extends AppCompatActivity {
         TextView chatWith = binding.chatWith;
 
 
-        Button send = binding.btnSend;
-        send.setOnClickListener(view-> {
-            sendMsg();
-        });
-
         db = Room.databaseBuilder(getApplicationContext(), AppDB.class, "users")
                 .allowMainThreadQueries().build();
         String[] arr = getIntent().getExtras().getStringArray("chatInfo");
@@ -91,16 +86,24 @@ public class ChatActivity extends AppCompatActivity {
         msgs = binding.messages;
 
         msgList = setMsgsArray();
-
         adapter = new MessageAdapter(msgList, logged.getUsername());
+
         msgs.setAdapter(adapter);
+
+        binding.btnSend.setOnClickListener(view-> {
+            sendMsg();
+            adapter.notifyDataSetChanged();
+            System.out.println("ko");
+        });
     }
+
 
     private void sendMsg() {
         //server request here
         AddMessagesToServer(logged.getUsername(), logged.getPassword(), binding.etInput.getText().toString());
         binding.etInput.setText("");
         getMessagesFromServer(logged.getUsername(), logged.getPassword());
+
     }
 
     private void loadMessages() {
@@ -108,8 +111,8 @@ public class ChatActivity extends AppCompatActivity {
         // Assuming you have a list of messages called "messageList"
 
         getMessagesFromServer(logged.getUsername(),logged.getPassword());
-        adapter = new MessageAdapter(msgList,logged.getUsername());
-        msgs.setAdapter(adapter);
+
+        adapter.notifyDataSetChanged();
     }
     private ArrayList<Message> setMsgsArray() {
         ArrayList<Message> chatmsg = logged.getMessages();
@@ -186,14 +189,12 @@ public class ChatActivity extends AppCompatActivity {
 
         if(responseCode.get()==200) {
             Gson gson = new Gson();
-            ArrayList<Message> msg = gson.fromJson(responseBody[0].toString(), new TypeToken<ArrayList<Message>>() {}.getType());;
+            ArrayList<Message> msg = gson.fromJson(responseBody[0].toString(), new TypeToken<ArrayList<Message>>() {}.getType());
+            msgList.clear();
             for(Message m: msg) {
                 m.setChatId(chatId);
+                msgList.add(m);
             }
-
-            msgList = new ArrayList<>(msg);
-            //adapter.notifyDataSetChanged();
-
 
         }
         else{
