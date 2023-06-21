@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
@@ -22,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class ChatActivity extends AppCompatActivity {
     
@@ -95,8 +97,9 @@ public class ChatActivity extends AppCompatActivity {
 
     private void sendMsg(String msg) {
         //server request here
-
+        AddMessagesToServer(logged.getUsername(), logged.getPassword(), binding.etInput.getText().toString());
         binding.etInput.setText("");
+
     }
 
     private void loadMessages() {
@@ -104,7 +107,7 @@ public class ChatActivity extends AppCompatActivity {
         // Assuming you have a list of messages called "messageList"
 
         msgList = setMsgsArray();
-        //texts.clear();
+
 
         adapter.notifyDataSetChanged();
     }
@@ -130,7 +133,7 @@ public class ChatActivity extends AppCompatActivity {
     }
 
 
-    private void getMessagesFromServer(String username, String password, int id){
+    private void getMessagesFromServer(String username, String password){
         getToken(username, password);
         Thread thread = new Thread(new Runnable() {
             private StringBuilder responseBody; // Variable to hold the response body
@@ -142,7 +145,7 @@ public class ChatActivity extends AppCompatActivity {
             @Override
             public void run() {
                 try {
-                    URL url = new URL("http://10.0.2.2:5000/api/Chats/"+id);
+                    URL url = new URL("http://10.0.2.2:5000/api/Chats/"+ chatId);
                     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                     connection.setRequestMethod("GET");
                     connection.setRequestProperty("Content-Type", "application/json");
@@ -183,7 +186,7 @@ public class ChatActivity extends AppCompatActivity {
             throw new RuntimeException(e);
         }
     }
-    private void AddMessagesToServer(String username, String password,int id, String message){
+    private void AddMessagesToServer(String username, String password, String message){
         getToken(username, password);
         Thread thread = new Thread(new Runnable() {
             private StringBuilder responseBody; // Variable to hold the response body
@@ -195,14 +198,15 @@ public class ChatActivity extends AppCompatActivity {
             @Override
             public void run() {
                 try {
-                    URL url = new URL("http://10.0.2.2:5000/api/Chats/"+id+"/Messages"); // Replace with your API endpoint
+                    URL url = new URL("http://10.0.2.2:5000/api/Chats/"+chatId+"/Messages"); // Replace with your API endpoint
 
                     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                     connection.setRequestMethod("POST");
                     connection.setRequestProperty("Content-Type", "application/json");
+                    connection.setRequestProperty("Authorization", "Bearer " + token);
                     connection.setDoOutput(true);
 
-                    String requestBody = message;
+                    String requestBody = "{\"msg\": \"" + message + "\"}";
 
                     try {
                         DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream());
@@ -244,7 +248,8 @@ public class ChatActivity extends AppCompatActivity {
         }
     }
 
-    private void getToken(String username, String password ) {
+    private void getToken(String username, String password) {
+        AtomicInteger responseCode = new AtomicInteger();
         Thread thread = new Thread(new Runnable() {
             private StringBuilder responseBody; // Variable to hold the response body
 
@@ -255,7 +260,7 @@ public class ChatActivity extends AppCompatActivity {
             @Override
             public void run() {
                 try {
-                    URL url = new URL(Settings.getServer()+"/api/Tokens/"); // Replace with your API endpoint
+                    URL url = new URL(Settings.getServer() + "/api/Tokens/"); // Replace with your API endpoint
 
                     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                     connection.setRequestMethod("POST");
@@ -274,7 +279,7 @@ public class ChatActivity extends AppCompatActivity {
                     }
 
 
-                    String responseCode= String.valueOf(connection.getResponseCode());
+                    responseCode.set(connection.getResponseCode());
 
                     StringBuilder responseBody;
                     try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
@@ -284,9 +289,9 @@ public class ChatActivity extends AppCompatActivity {
                         while ((line = reader.readLine()) != null) {
                             response.append(line);
                         }
-                        token = String.valueOf(new StringBuilder(response.toString())); // Assign the response to the variable
+                        responseBody = new StringBuilder(response.toString()); // Assign the response to the variable
                     }
-
+                    token = responseBody.toString();
 
                     connection.disconnect();
                 } catch (IOException e) {
@@ -303,8 +308,12 @@ public class ChatActivity extends AppCompatActivity {
             // Wait for the thread to finish
             thread.join();
         } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
+        }
+        if (responseCode.get() == 200) {
+
+        } else {
+            Toast.makeText(getApplicationContext(), "Error", Toast.LENGTH_LONG).show();
         }
     }
-
 }

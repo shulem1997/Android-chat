@@ -139,6 +139,7 @@ public class ContactsActivity extends AppCompatActivity {
                             chatList = gson.fromJson(chats, arrayListType);
 
                             logged.setChats(chatList);
+                            userDao.update(logged);
                         }
                     } else {
                         // Handle the error case
