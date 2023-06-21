@@ -66,10 +66,11 @@ public class Message {
     public boolean getIsSender() {
         return this.isSender;
     }
-    public int getDraw() {
-        if(isSender)
-            return R.drawable.bubble_from;
-        return R.drawable.bubble_to;
+
+    public String getSenderName() {
+        return this.sender.getUsername();
     }
+
+
 }
 
