@@ -33,10 +33,11 @@ public class ChatActivity extends AppCompatActivity {
     private AppDB db;
     private UserDao userDao;
     private RecyclerView msgs;
-    private ArrayList<Message> tmp;
     private Chat chat;
     private ArrayList<Message> msgList;
+    private ArrayList<User> contact;
     private MessageAdapter adapter;
+    private ContactAdapter contactAdapter;
     private int chatId;
 
 
@@ -50,7 +51,8 @@ public class ChatActivity extends AppCompatActivity {
         binding = ActivityChatBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        TextView chatWith = binding.chatWith;
+        //TextView chatWith = binding.chatWith;
+
 
 
         db = Room.databaseBuilder(getApplicationContext(), AppDB.class, "users")
@@ -62,7 +64,10 @@ public class ChatActivity extends AppCompatActivity {
         logged = userDao.get(username);
         chat = getChat();
 
-        chatWith.setText(chat.getUser().getDisplayName());
+        contact = new ArrayList<>();
+        contact.add(chat.getUser());
+        contactAdapter = new ContactAdapter(contact);
+        binding.chatWith.setAdapter(contactAdapter);
 
         handleMessages();
         //getMessagesFromServer(logged.getUsername(), logged.getPassword());
