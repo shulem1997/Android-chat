@@ -202,7 +202,7 @@ public class LoginActivity extends AppCompatActivity {
             UserJson userJson = gson.fromJson(responseBody[0].toString(), UserJson.class);
             logged = new User(username, password, userJson.getDisplayName());
             logged.setProfilePic(userJson.getProfilePic());
-            //Toast.makeText(getApplicationContext(), responseBody[0].toString(), Toast.LENGTH_LONG).show();
+
         }
         else{
             Toast.makeText(getApplicationContext(), "Wrong getLogged", Toast.LENGTH_LONG).show();

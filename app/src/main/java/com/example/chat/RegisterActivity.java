@@ -208,8 +208,8 @@ public class RegisterActivity extends Activity {
         Toast.makeText(getApplicationContext(), "Registration successful", Toast.LENGTH_SHORT).show();
 
         //save to local db, change later*****************************:
-        user = new User(username, password, displayName);
-        userDao.insert(user);
+//        user = new User(username, password, displayName);
+//        userDao.insert(user);
         //**********************************************************
 
 

@@ -21,12 +21,14 @@ import java.util.List;
 
 public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
     private List<Message> msgList;
+    private String logged;
 
     public static final int VIEW_TYPE_SENT = 1;
     public static final int VIEW_TYPE_RECEIVE = 2;
 
-    public MessageAdapter(List<Message> msgList) {
+    public MessageAdapter(List<Message> msgList, String logged) {
         this.msgList = msgList;
+        this.logged = logged;
     }
 
     @NonNull
@@ -60,7 +62,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         return msgList.size();
     }
     public int getItemViewType(int position) {
-        if(msgList.get(position).getIsSender()) {
+        if(msgList.get(position).getSenderName().equals(logged)) {
             return VIEW_TYPE_SENT;
         }
         return VIEW_TYPE_RECEIVE;
