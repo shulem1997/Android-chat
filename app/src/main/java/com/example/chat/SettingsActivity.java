@@ -17,11 +17,14 @@ public class SettingsActivity extends AppCompatActivity {
         setContentView(R.layout.settings_activity);
         Button saveButton = findViewById(R.id.saveButton);
         EditText server= findViewById(R.id.server);
+        EditText theme= findViewById(R.id.theme);
         server.setText(Settings.getServer());
+        theme.setText(Settings.getTheme());
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Settings.setServer(server.getText().toString());
+                Settings.setTheme(theme.getText().toString());
                 finish();
             }
         });

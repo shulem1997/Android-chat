@@ -8,7 +8,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.util.Log;
+import android.util.Base64;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -16,7 +16,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.room.Dao;
 import androidx.room.Room;
 
 import java.io.BufferedReader;
@@ -26,11 +25,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
-import android.util.Base64;
-import java.io.ByteArrayOutputStream;
 
 public class RegisterActivity extends Activity {
 
@@ -49,6 +43,7 @@ public class RegisterActivity extends Activity {
 
     private static final int PICK_IMAGE_REQUEST = 1;
     private Uri selectedImageUri;
+    private int responseCode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,13 +116,20 @@ public class RegisterActivity extends Activity {
         String password = passwordEditText.getText().toString();
         String verifyPassword = verifyEditText.getText().toString();
         String displayName = displayNameEditText.getText().toString();
-        Drawable drawable = profilePicImageView.getDrawable();
-        Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();
+        String profilePic="";
+        try{
+            Drawable drawable = profilePicImageView.getDrawable();
+            Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();
 
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
-        byte[] byteArray = byteArrayOutputStream.toByteArray();
-        String profilePic=Base64.encodeToString(byteArray, Base64.DEFAULT);
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
+            byte[] byteArray = byteArrayOutputStream.toByteArray();
+             profilePic=Base64.encodeToString(byteArray, Base64.DEFAULT);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+
 
         // Validate input fields
         if (username.isEmpty() || password.isEmpty() || verifyPassword.isEmpty() || displayName.isEmpty()) {
@@ -140,9 +142,12 @@ public class RegisterActivity extends Activity {
             return;
         }
 
+        String finalProfilePic = profilePic;
         Thread thread = new Thread(new Runnable() {
-            Drawable drawable = profilePicImageView.getDrawable();
-            Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();
+
+
+
+
 
 
 
@@ -162,7 +167,7 @@ public class RegisterActivity extends Activity {
                     connection.setRequestProperty("Content-Type", "application/json");
                     connection.setDoOutput(true);
 
-                    String requestBody = "{\"username\": \"" + username + "\", \"password\": \"" + password + "\", \"displayName\": \"" + displayName + "\", \"profilePic\": \"" + profilePic + "\"}";
+                    String requestBody = "{\"username\": \"" + username + "\", \"password\": \"" + password + "\", \"displayName\": \"" + displayName + "\", \"profilePic\": \"" + finalProfilePic + "\"}";
 
 
                     try {
@@ -173,7 +178,7 @@ public class RegisterActivity extends Activity {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-
+                    responseCode=connection.getResponseCode();
 
 
                     StringBuilder responseBody;
@@ -205,16 +210,15 @@ public class RegisterActivity extends Activity {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        Toast.makeText(getApplicationContext(), "Registration successful", Toast.LENGTH_SHORT).show();
-
-        //save to local db, change later*****************************:
-//        user = new User(username, password, displayName);
-//        userDao.insert(user);
-        //**********************************************************
-
-
-        // Navigate to login screen
-        navigateToLogin();
+        if(responseCode==200){
+            Toast.makeText(getApplicationContext(), "Registration successful", Toast.LENGTH_SHORT).show();
+            // Navigate to login screen
+            navigateToLogin();
+        }
+        else if(responseCode==409)
+            Toast.makeText(getApplicationContext(), "User already exits", Toast.LENGTH_SHORT).show();
+        else
+            Toast.makeText(getApplicationContext(), "Error registering", Toast.LENGTH_SHORT).show();
     }
 
     // Navigate to the login screen

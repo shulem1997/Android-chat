@@ -1,21 +1,23 @@
 package com.example.chat;
 
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.room.Room;
 
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.firebase.iid.FirebaseInstanceId;
-import com.google.firebase.iid.InstanceIdResult;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -37,19 +39,25 @@ public class LoginActivity extends AppCompatActivity {
     private User logged;
     private UserDao userDao;
     private AppDB db;
+    private ActivityResultLauncher<Intent> startActivityLauncher;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        FirebaseInstanceId.getInstance().getInstanceId().addOnSuccessListener( LoginActivity.this,  new OnSuccessListener<InstanceIdResult>() {
-            @Override
-            public void onSuccess(InstanceIdResult instanceIdResult) {
-                String newToken = instanceIdResult.getToken();
-                Log.e("newToken",newToken);
+//        FirebaseInstanceId.getInstance().getInstanceId().addOnSuccessListener( LoginActivity.this,  new OnSuccessListener<InstanceIdResult>() {
+//            @Override
+//            public void onSuccess(InstanceIdResult instanceIdResult) {
+//                String newToken = instanceIdResult.getToken();
+//                Log.e("newToken",newToken);
+//
+//            }
+//        });
 
-            }
-        });
+
+
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         Settings.setServer("http://10.0.2.2:5000");
+        Settings.setTheme("light");
         usernameEditText = findViewById(R.id.username);
         passwordEditText = findViewById(R.id.password);
         FloatingActionButton settings = findViewById(R.id.settingsButton);
@@ -60,18 +68,73 @@ public class LoginActivity extends AppCompatActivity {
                 clickLogin();
             }
         });
-        settings.setOnClickListener(view-> {
-            Intent intent = new Intent(this, SettingsActivity.class);
+//        settings.setOnClickListener(view-> {
+//            Intent intent = new Intent(this, SettingsActivity.class);
+//            startActivity(intent);
+//
+//        });
+      TextView register = findViewById(R.id.linkToRegister);
+        register.setOnClickListener(view-> {
+            Intent intent = new Intent(this, RegisterActivity.class);
             startActivity(intent);
 
         });
-        TextView link = findViewById(R.id.linkToRegister);
-        link.setOnClickListener(view-> {
-                Intent intent = new Intent(this, RegisterActivity.class);
-                startActivity(intent);
+        startActivityLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                new ActivityResultCallback<ActivityResult>() {
+                    @Override
+                    public void onActivityResult(ActivityResult result) {
+                        View mainLayout = findViewById(R.id.main_layout);
+                        if (Settings.getTheme().equals("dark")) {
+
+                            int drawableResId = R.drawable.dark_background; // Replace with your own resource ID
+                            Drawable backgroundDrawable = getDrawable(drawableResId);
+                            mainLayout.setBackground(backgroundDrawable);
+                        }
+                        else{
+                            int drawableResId = R.drawable.background; // Replace with your own resource ID
+                            Drawable backgroundDrawable = getDrawable(drawableResId);
+                            mainLayout.setBackground(backgroundDrawable);
+                        }
+                    }
+                });
+        settings.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Open the settings activity
+                Intent intent = new Intent(LoginActivity.this, SettingsActivity.class);
+                startActivityLauncher.launch(intent);
+            }
         });
 
 
+
+
+    }
+
+
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        super.onActivityResult(requestCode, resultCode, data);
+//
+//        View mainLayout = findViewById(R.id.main_layout);
+//        if(Settings.getTheme()=="dark") {
+//             int drawableResId = R.drawable.dark_background; // Replace with your own resource ID
+//            Drawable backgroundDrawable = ContextCompat.getDrawable(this, drawableResId);
+//            mainLayout.setBackground(backgroundDrawable);
+//
+//        }
+//    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        View mainLayout = findViewById(R.id.main_layout);
+        if(Settings.getTheme()=="dark") {
+            int drawableResId = R.drawable.dark_background; // Replace with your own resource ID
+            Drawable backgroundDrawable = ContextCompat.getDrawable(this, drawableResId);
+            mainLayout.setBackground(backgroundDrawable);
+
+        }
     }
 
     private void clickLogin() {
