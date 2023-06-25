@@ -12,7 +12,12 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.room.Room;
 
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -22,11 +27,7 @@ import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.SplittableRandom;
 import java.util.concurrent.atomic.AtomicInteger;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
 
 public class LoginActivity extends AppCompatActivity {
@@ -38,6 +39,14 @@ public class LoginActivity extends AppCompatActivity {
     private AppDB db;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        FirebaseInstanceId.getInstance().getInstanceId().addOnSuccessListener( LoginActivity.this,  new OnSuccessListener<InstanceIdResult>() {
+            @Override
+            public void onSuccess(InstanceIdResult instanceIdResult) {
+                String newToken = instanceIdResult.getToken();
+                Log.e("newToken",newToken);
+
+            }
+        });
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         Settings.setServer("http://10.0.2.2:5000");
