@@ -15,6 +15,7 @@
         android:theme="@style/Theme.Chat"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
+
         <service
             android:name=".ServerService"
             android:enabled="true"

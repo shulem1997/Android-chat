@@ -1,8 +1,11 @@
 package com.example.chat;
 
+import static android.content.ContentValues.TAG;
+
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -17,7 +20,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.room.Room;
 
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -42,14 +47,12 @@ public class LoginActivity extends AppCompatActivity {
     private ActivityResultLauncher<Intent> startActivityLauncher;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-//        FirebaseInstanceId.getInstance().getInstanceId().addOnSuccessListener( LoginActivity.this,  new OnSuccessListener<InstanceIdResult>() {
-//            @Override
-//            public void onSuccess(InstanceIdResult instanceIdResult) {
-//                String newToken = instanceIdResult.getToken();
-//                Log.e("newToken",newToken);
-//
-//            }
-//        });
+
+        Task<String> s = FirebaseMessaging.getInstance().getToken().addOnSuccessListener(this, instanceIdresult->{
+            String refreshedToken = String.valueOf(FirebaseMessaging.getInstance().getToken());
+            Log.d(TAG, "Refreshed token: " + refreshedToken);
+        });
+
 
 
 
