@@ -51,7 +51,10 @@ public class LoginActivity extends AppCompatActivity {
     private Socket mSocket;
     {
         try {
-            mSocket = IO.socket("server");
+            String server=Settings.getServer();
+            if (server==null)
+                server="http://10.0.2.2:5000";
+ ;          mSocket = IO.socket(server);
         } catch (URISyntaxException e) {}
     }
     private ActivityResultLauncher<Intent> startActivityLauncher;
@@ -62,15 +65,15 @@ public class LoginActivity extends AppCompatActivity {
             String refreshedToken = String.valueOf(FirebaseMessaging.getInstance().getToken());
             Log.d(TAG, "Refreshed token: " + refreshedToken);
         });
-
+        Settings.setServer("http://10.0.2.2:5000");
+        Settings.setTheme("light");
         mSocket.connect();
 
 
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        Settings.setServer("http://10.0.2.2:5000");
-        Settings.setTheme("light");
+
         usernameEditText = findViewById(R.id.username);
         passwordEditText = findViewById(R.id.password);
         FloatingActionButton settings = findViewById(R.id.settingsButton);

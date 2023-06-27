@@ -44,7 +44,10 @@ public class ChatActivity extends AppCompatActivity {
     private Socket mSocket;
     {
         try {
-            mSocket = IO.socket("server");
+            String server=Settings.getServer();
+            if (server==null)
+                server="http://10.0.2.2:5000";
+            ;          mSocket = IO.socket(server);
         } catch (URISyntaxException e) {}
     }
     private Emitter.Listener onNewMessage = new Emitter.Listener() {
