@@ -64,7 +64,7 @@ public class ChatActivity extends AppCompatActivity {
                     }
 
                     // add the message to view
-                    //addMessage(username, message);
+                    loadMessages();
                 }
             });
         }
