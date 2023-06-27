@@ -2,9 +2,6 @@ package com.example.chat;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,17 +12,22 @@ import com.example.chat.databinding.ActivityChatBinding;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-
-import java.util.ArrayList;
-import java.util.List;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import io.socket.client.IO;
+import io.socket.client.Socket;
+import io.socket.emitter.Emitter;
 
 public class ChatActivity extends AppCompatActivity {
     
@@ -39,8 +41,34 @@ public class ChatActivity extends AppCompatActivity {
     private MessageAdapter adapter;
     private ContactAdapter contactAdapter;
     private int chatId;
+    private Socket mSocket;
+    {
+        try {
+            mSocket = IO.socket("server");
+        } catch (URISyntaxException e) {}
+    }
+    private Emitter.Listener onNewMessage = new Emitter.Listener() {
+        @Override
+        public void call(final Object... args) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    JSONObject data = (JSONObject) args[0];
+                    String username;
+                    String message;
+                    try {
+                        username = data.getString("username");
+                        message = data.getString("message");
+                    } catch (JSONException e) {
+                        return;
+                    }
 
-
+                    // add the message to view
+                    //addMessage(username, message);
+                }
+            });
+        }
+    };
     private ActivityChatBinding binding;
     private String token;
     private String messages;
@@ -50,7 +78,7 @@ public class ChatActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityChatBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-
+        mSocket.connect();
         //TextView chatWith = binding.chatWith;
 
 
@@ -105,12 +133,20 @@ public class ChatActivity extends AppCompatActivity {
 
     private void sendMsg() {
         //server request here
+
+        mSocket.emit("new message", binding.etInput.getText().toString());
         AddMessagesToServer(logged.getUsername(), logged.getPassword(), binding.etInput.getText().toString());
         binding.etInput.setText("");
         getMessagesFromServer(logged.getUsername(), logged.getPassword());
 
     }
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
 
+        mSocket.disconnect();
+        mSocket.off("new message", onNewMessage);
+    }
     private void loadMessages() {
 
         // Assuming you have a list of messages called "messageList"

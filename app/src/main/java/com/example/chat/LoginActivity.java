@@ -32,9 +32,13 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import io.socket.client.IO;
+import io.socket.client.Socket;
 
 
 public class LoginActivity extends AppCompatActivity {
@@ -44,6 +48,12 @@ public class LoginActivity extends AppCompatActivity {
     private User logged;
     private UserDao userDao;
     private AppDB db;
+    private Socket mSocket;
+    {
+        try {
+            mSocket = IO.socket("server");
+        } catch (URISyntaxException e) {}
+    }
     private ActivityResultLauncher<Intent> startActivityLauncher;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +63,7 @@ public class LoginActivity extends AppCompatActivity {
             Log.d(TAG, "Refreshed token: " + refreshedToken);
         });
 
-
+        mSocket.connect();
 
 
 
@@ -212,6 +222,7 @@ public class LoginActivity extends AppCompatActivity {
             getChats();
             getMessages();
             saveLogged(logged);
+            intent.putExtra("username", username);
             intent.putExtra("username", username);
             startActivity(intent);
         }
