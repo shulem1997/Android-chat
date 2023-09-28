@@ -53,7 +53,7 @@ public class LoginActivity extends AppCompatActivity {
         try {
             String server=Settings.getServer();
             if (server==null)
-                server="http://10.0.2.2:5000";
+                server="http://10.0.2.2:8080";
  ;          mSocket = IO.socket(server);
         } catch (URISyntaxException e) {}
     }
@@ -65,7 +65,7 @@ public class LoginActivity extends AppCompatActivity {
             String refreshedToken = String.valueOf(FirebaseMessaging.getInstance().getToken());
             Log.d(TAG, "Refreshed token: " + refreshedToken);
         });
-        Settings.setServer("http://10.0.2.2:5000");
+        Settings.setServer("http://10.0.2.2:8080");
         Settings.setTheme("light");
         mSocket.connect();
 
@@ -217,7 +217,7 @@ public class LoginActivity extends AppCompatActivity {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        if(responseCode.get()==200) {
+        if(responseCode.get()>= 200 && responseCode.get() < 300) {
 
             Intent intent = new Intent(this, ContactsActivity.class);
             //String[] arr = new String[] {username, password, token};
@@ -226,7 +226,7 @@ public class LoginActivity extends AppCompatActivity {
             getMessages();
             saveLogged(logged);
             intent.putExtra("username", username);
-            intent.putExtra("username", username);
+            //intent.putExtra("username", username);
             startActivity(intent);
         }
         else{
@@ -245,7 +245,7 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void run() {
                 try {
-                    URL url = new URL("http://10.0.2.2:5000/api/Users/" + username); // Replace with your API endpoint
+                    URL url = new URL(Settings.getServer()+"/api/Users/" + username); 
 
                     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                     connection.setRequestMethod("GET");
@@ -285,7 +285,7 @@ public class LoginActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        if(responseCode.get()==200) {
+        if(responseCode.get()>= 200 && responseCode.get() < 300) {
 
             Gson gson = new Gson();
             UserJson userJson = gson.fromJson(responseBody[0].toString(), UserJson.class);
@@ -308,7 +308,7 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void run() {
                 try {
-                    URL url = new URL("http://10.0.2.2:5000/api/Chats");
+                    URL url = new URL(Settings.getServer()+"/api/Chats");
 
                     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                     connection.setRequestMethod("GET");
@@ -381,7 +381,7 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void run() {
                 try {
-                    URL url = new URL("http://10.0.2.2:5000/api/Chats/" + chat + "/Messages"); // Replace with your API endpoint
+                    URL url = new URL(Settings.getServer()+"/api/Chats/" + chat + "/Messages"); // Replace with your API endpoint
 
                     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                     connection.setRequestMethod("GET");
