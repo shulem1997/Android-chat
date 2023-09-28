@@ -59,7 +59,7 @@ http_server.listen(8080);
 
 io.on("connection", (socket) => {
   
-  console.log('welcome: ' + socket.id)
+  
   socket.on('send', ()=> {  
     socket.broadcast.emit('newMsg')
   })
